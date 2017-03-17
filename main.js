@@ -30,6 +30,8 @@ var famousPeople = [{
 var cardHolder = document.getElementById("cardHolder");
 var userInput = document.getElementById("userInput")
 var cardCounter = 0;
+var cardSelected = false;
+var selectedElement;
 
 var createPerson = currentPerson => { //prints the array to the DOM, called at bottom of page
     var newPerson = document.createElement("person");
@@ -64,22 +66,30 @@ var createPerson = currentPerson => { //prints the array to the DOM, called at b
 }
 
 var personClicked = e => {
-    let parentElement;
-    if (e.target.nodeName === "PERSON") {
-        parentElement = e.target;
-    } else {
-        parentElement = e.target.parentNode; //Makes sure I select the card!
-    }
-    parentElement.className += " dottedBorder"; //adds dotted border to person card
-    userInput.focus(); //adds focus to input field
-    userInput.addEventListener("keyup", function() { //pairs person's bio and input field
-        parentElement.children[4].innerText = userInput.value;
-    });
-    userInput.addEventListener("keypress", function(f) { //empties input field
-        if (f.keyCode === 13) {
-            userInput.value = "";
+    if (cardSelected === false) {
+        cardSelected = true;
+        if (e.target.nodeName === "PERSON") {
+            selectedElement = e.target;
+        } else {
+            selectedElement = e.target.parentElement; //Makes sure I select the card!
         }
-    });
+        selectedElement.classList.toggle("dottedBorder"); //adds dotted border to person card
+        userInput.focus(); //adds focus to input field
+        userInput.value = selectedElement.children[4].innerText;
+        userInput.addEventListener("keyup", pairBio);
+    }
+};
+
+function pairBio(e) {
+    selectedElement.children[4].innerText = userInput.value;
+    if (e.keyCode === 13) {
+        selectedElement.children[4].innerText = userInput.value;
+        userInput.value = "";
+        selectedElement.classList.toggle("dottedBorder");
+        userInput.removeEventListener("keyup", pairBio);
+        selectedElement = "";
+        cardSelected = false;
+    }
 }
 
 for (i = 0; i < famousPeople.length; i++) {
